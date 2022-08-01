@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: b2e0c1fccf6efa54e8bb7d4f95e4af1b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - RedMat: {fileID: -2870021472586168505, guid: 961faa21bd70671428f84ed621e94917, type: 3}
+  - GreenMat: {fileID: 1151844921754575795, guid: ebe119fe19f0d634583768d4b1f1a8bc, type: 3}
+  - BlueMat: {fileID: 7770318624900243041, guid: 51ebfcac5e4cbdc45abb6f4a26ba15ed, type: 3}
+  - BallMesh: {instanceID: 0}
+  - ClubMesh: {instanceID: 0}
+  - FlagMesh: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
