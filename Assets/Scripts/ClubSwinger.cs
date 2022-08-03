@@ -127,6 +127,7 @@ public class ClubSwinger : MonoBehaviour
             collision.rigidbody.velocity = Vector3.zero;
             collision.gameObject.GetComponent<BallScript>().HitBall( dir * velocity * 5f);
             this.transform.GetChild(0).gameObject.layer = LayerMask.NameToLayer("ClubNoCollision");
+            GameManager.GetInstance().HitBall();
         }
         
     }

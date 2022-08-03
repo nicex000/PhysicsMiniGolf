@@ -4,15 +4,25 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public enum WinType
+{
+    Albatross = -3,
+    Eagle = -2,
+    Birdie = -1,
+    Par = 0,
+    Bogey = 1,
+    Double_Bogey = 2,
+    Hole_Cleared = 3
+}
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private float BallWinTime;
     [SerializeField] private float killZ;
+    [SerializeField] private float VictoryScreenTime;
     [SerializeField] private GameObject SwingPoint;
-
     private Rigidbody ballInHole;
     private float BallWinTimer;
-
 
 
 
@@ -20,16 +30,22 @@ public class GameManager : MonoBehaviour
 
     private static GameManager _instance;
     private int CurrentHole;
+    private int CurrentHits;
+    private int CurrentHolePar;
 
     private List<StartpointComponent> Startpoints;
+    private UIScript UIScript;
+    private float VictoryScreenTimer;
 
     // Start is called before the first frame update
     void Start()
     {
+        UIScript = FindObjectOfType<UIScript>();
         _instance = this;
         BallWinTimer = 0f;
         Startpoints = FindObjectsOfType<StartpointComponent>().ToList();
-        CurrentHole = 0;
+        CurrentHole = -1;
+        IncrementHole();
         SpawnClub();
     }
 
@@ -41,10 +57,8 @@ public class GameManager : MonoBehaviour
             BallWinTimer += Time.deltaTime;
             if (BallWinTimer > BallWinTime)
             {
-                CurrentHole++;
-                Destroy(ballInHole.gameObject);
-                ballInHole = null;
-                SpawnClub();
+                DisplayWin();
+                VictoryScreenTimer += Time.deltaTime;
             }
         }
         else if (BallWinTimer > 0f)
@@ -52,8 +66,56 @@ public class GameManager : MonoBehaviour
             BallWinTimer = 0f;
 
         }
+        if (VictoryScreenTimer > 0f)
+        {
+            if (VictoryScreenTimer >= VictoryScreenTime)
+            {
+                IncrementHole();
+                Destroy(ballInHole.gameObject);
+                ballInHole = null;
+                SpawnClub();
+                VictoryScreenTimer = 0f;
+                BallWinTimer = 0f;
+            }
+            else
+            {
+                VictoryScreenTimer += Time.deltaTime;
+            }
+        }
     }
 
+    void DisplayWin()
+    {
+        WinType winType;
+        if (CurrentHits < CurrentHolePar - 2)
+            winType = WinType.Albatross;
+        else if (CurrentHits > CurrentHolePar + 2)
+        {
+            winType = WinType.Hole_Cleared;
+        }
+        else
+        {
+            int x = CurrentHits - CurrentHolePar;
+            winType = (WinType)(x);
+        }
+
+        UIScript.ClearHole(winType);
+    }
+
+    void IncrementHole()
+    {
+        CurrentHole++;
+        StartpointComponent spawnpoint = Startpoints.FirstOrDefault(point => point.Hole == CurrentHole);
+        if (spawnpoint != null)
+        {
+            UIScript.NewHole();
+            CurrentHolePar = spawnpoint.Par;
+            UIScript.SetHoleAndPar(CurrentHole, CurrentHolePar);
+            CurrentHits = 0;
+            UIScript.SetStrokes(CurrentHits);
+        }
+    }
+    
     public static GameManager GetInstance()
     {
         return _instance;
@@ -67,6 +129,8 @@ public class GameManager : MonoBehaviour
 
     public void SpawnClub(Transform ball = null)
     {
+        if (ballInHole) return;
+
         StartpointComponent spawnpoint = Startpoints.FirstOrDefault(point => point.Hole == CurrentHole);
         if (spawnpoint != null)
         {
@@ -79,5 +143,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
+    }
+
+    public void HitBall()
+    {
+        CurrentHits++;
+        UIScript.SetStrokes(CurrentHits);
     }
 }
