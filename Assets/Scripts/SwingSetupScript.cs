@@ -34,6 +34,7 @@ public class SwingSetupScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!Ball) Destroy(this);
         if (IsAttached)
             ClubPivot.localPosition = Ball.localPosition + Offset;
     }
@@ -48,6 +49,7 @@ public class SwingSetupScript : MonoBehaviour
         ExistingBall = ball.gameObject;
         Tee.gameObject.SetActive(false);
         ClubPivot.GetComponent<ClubSwinger>().MaxAngle = 180f;
+        ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
 
     public void DetachBallAndDestroy()
