@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum WinType
 {
@@ -15,6 +16,7 @@ public enum WinType
     Hole_Cleared = 3
 }
 
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private float BallWinTime;
@@ -24,6 +26,7 @@ public class GameManager : MonoBehaviour
     private Rigidbody ballInHole;
     private float BallWinTimer;
 
+    private string[] ScoreKeyStrings = { "Hole1BestScore", "Hole2BestScore", "Hole3BestScore", "Hole4BestScore" };
 
 
     public float KillZ => killZ;
@@ -100,6 +103,13 @@ public class GameManager : MonoBehaviour
         }
 
         UIScript.ClearHole(winType);
+
+        int bestScore = PlayerPrefs.GetInt(ScoreKeyStrings[CurrentHole]);
+        if (bestScore <= 0 || bestScore > CurrentHits)
+        {
+            PlayerPrefs.SetInt(ScoreKeyStrings[CurrentHole], CurrentHits);
+        }
+
     }
 
     void IncrementHole()
@@ -141,6 +151,10 @@ public class GameManager : MonoBehaviour
             {
                 go.GetComponent<SwingSetupScript>().SetBall(ball);
             }
+        }
+        else
+        {
+            SceneManager.LoadScene("MenuScene");
         }
 
     }
